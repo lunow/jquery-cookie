@@ -6,9 +6,36 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.opensource.org/licenses/GPL-2.0
+ *
+ *  Added Versionized Cookies Feature!
+ *  Set current Version in $.versionizedCookie.version = '1.0';
+ *  every cookie related to an old version will be deleted.
+ *  Paul Lunow, 8.6.12
  */
 (function($) {
+    $.versionizedCookie = {
+        version: '1.0',
+        seperator: '___'
+    };
     $.cookie = function(key, value, options) {
+        var setVersion = function(name) {
+            if(typeof $.versionizedCookie == 'object') {
+                name = $.versionizedCookie.version+$.versionizedCookie.seperator+name;
+            }
+            return name;
+        };
+
+        var checkVersion = function(name) {
+            if(typeof $.versionizedCookie == 'object') {
+                var parts = name.split($.versionizedCookie.seperator);
+                if(parts[0] != $.versionizedCookie.version) {
+                    $.cookie(parts[1], null);
+                    return null;
+                }
+                return parts[1];
+            }
+            return name;
+        };
 
         // key and at least value given, set cookie...
         if (arguments.length > 1 && (!/Object/.test(Object.prototype.toString.call(value)) || value === null || value === undefined)) {
@@ -23,7 +50,7 @@
                 t.setDate(t.getDate() + days);
             }
 
-            value = String(value);
+            value = setVersion(String(value));
 
             return (document.cookie = [
                 encodeURIComponent(key), '=', options.raw ? value : encodeURIComponent(value),
@@ -36,11 +63,11 @@
 
         // key and possibly options given, get cookie...
         options = value || {};
-        var decode = options.raw ? function(s) { return s; } : decodeURIComponent;
+        var decode = options.raw ? function(s) { return checkVersion(s); } : decodeURIComponent;
 
         var pairs = document.cookie.split('; ');
         for (var i = 0, pair; pair = pairs[i] && pairs[i].split('='); i++) {
-            if (decode(pair[0]) === key) return decode(pair[1] || ''); // IE saves cookies with empty string as "c; ", e.g. without "=" as opposed to EOMB, thus pair[1] may be undefined
+            if (decode(pair[0]) === key) return checkVersion(decode(pair[1] || '')); // IE saves cookies with empty string as "c; ", e.g. without "=" as opposed to EOMB, thus pair[1] may be undefined
         }
         return null;
     };

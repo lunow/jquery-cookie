@@ -1,11 +1,21 @@
 var before = {
     setup: function () {
+        $.versionizedCookie = false;
         cookies = document.cookie.split('; ')
         for (var i = 0, c; (c = (cookies)[i]) && (c = c.split('=')[0]); i++) {
             document.cookie = c + '=; expires=' + new Date(0).toUTCString();
         }
     }
 };
+
+var beforeVersionized = {
+    setup: function() {
+        $.versionizedCookie = {
+            version: '1.0',
+            seperator: '###'
+        };
+    }
+}
 
 
 module('read', before);
@@ -77,4 +87,18 @@ test('delete', 2, function () {
     document.cookie = 'c=v';
     $.cookie('c', undefined);
     equal(document.cookie, '', 'should delete with undefined as value');
+});
+
+
+module('versionized', beforeVersionized);
+
+test('simple value', function() {
+    $.cookie('hello1', 'world');
+    equal($.cookie('hello1'), 'world');
+});
+
+test('remove outdated cookie', function() {
+    $.cookie('hello2', 'world');
+    $.versionizedCookie.version = '1.1';
+    equal(null, $.cookie('hello2'));
 });

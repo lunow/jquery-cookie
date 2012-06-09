@@ -1,12 +1,36 @@
-# jquery.cookie
+# jquery.cookie versionized!
 
 A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
+
+Every cookie is saved with a version String. If you change the version, all old cookies will be deleted. Great for Web Applications and Cache problems.
+
 
 ## Installation
 
 Include script *after* the jQuery library (unless you are packaging scripts somehow else):
 
     <script src="/path/to/jquery.cookie.js"></script>
+
+
+## Versionized
+
+Set a Version:
+
+    $.versionizedCookie.version = 2;
+
+The defaults are:
+
+    $.versionizedCookie = {
+        version: '1.0',
+        seperator: '___'
+    };
+
+If you dont want the versionized cookies use the original code or set the variable to false:
+
+    $.versionizedCookie = false;
+
+Thats it! Everything else is untouched and passes all tests.
+
 
 ## Usage
 
@@ -32,6 +56,7 @@ Delete cookie by passing null as value:
     $.cookie('the_cookie', null);
 
 *Note: when deleting a cookie, you must pass the exact same path, domain and secure options that were used to set the cookie.*
+
 
 ## Options
 
